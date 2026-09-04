@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Отчёт VK Ads</title>
+
+<style>
+  .vk-report {
+    color-scheme: light;
+    --surface-1:      #fcfcfb;
+    --surface-2:      #f9f9f7;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --grid:           #e1e0d9;
+    --baseline:       #c3c2b7;
+    --border:         rgba(11,11,11,0.10);
+    --series-blue:    #2a78d6;
+    --series-orange:  #eb6834;
+    --series-aqua:    #1baf7a;
+    --series-yellow:  #eda100;
+    --series-magenta: #e87ba4;
+    --series-green:   #008300;
+    --series-violet:  #4a3aa7;
+    --series-red:     #e34948;
+    --good:           #0ca30c;
+    --critical:       #d03b3b;
+    --seq-250: #86b6ef; --seq-300: #6da7ec; --seq-350: #5598e7;
+    --seq-450: #2a78d6; --seq-500: #256abf; --seq-600: #184f95;
+    --tooltip-bg: #1a1a19;
+    --tooltip-text: #ffffff;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .vk-report {
+      color-scheme: dark;
+      --surface-1:      #1a1a19;
+      --surface-2:      #0d0d0d;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --grid:           #2c2c2a;
+      --baseline:       #383835;
+      --border:         rgba(255,255,255,0.10);
+      --series-blue:    #3987e5;
+      --series-orange:  #d95926;
+      --series-aqua:    #199e70;
+      --series-yellow:  #c98500;
+      --series-magenta: #d55181;
+      --series-green:   #008300;
+      --series-violet:  #9085e9;
+      --series-red:     #e66767;
+      --good:           #0ca30c;
+      --critical:       #e66767;
+      --seq-250: #184f95; --seq-300: #1c5cab; --seq-350: #256abf;
+      --seq-450: #3987e5; --seq-500: #5598e7; --seq-600: #86b6ef;
+      --tooltip-bg: #fcfcfb;
+      --tooltip-text: #0b0b0b;
+    }
+  }
+  :root[data-theme="dark"] .vk-report {
+    color-scheme: dark;
+    --surface-1:      #1a1a19;
+    --surface-2:      #0d0d0d;
+    --text-primary:   #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted:     #898781;
+    --grid:           #2c2c2a;
+    --baseline:       #383835;
+    --border:         rgba(255,255,255,0.10);
+    --series-blue:    #3987e5;
+    --series-orange:  #d95926;
+    --series-aqua:    #199e70;
+    --series-yellow:  #c98500;
+    --series-magenta: #d55181;
+    --series-green:   #008300;
+    --series-violet:  #9085e9;
+    --series-red:     #e66767;
+    --good:           #0ca30c;
+    --critical:       #e66767;
+    --seq-250: #184f95; --seq-300: #1c5cab; --seq-350: #256abf;
+    --seq-450: #3987e5; --seq-500: #5598e7; --seq-600: #86b6ef;
+    --tooltip-bg: #fcfcfb;
+    --tooltip-text: #0b0b0b;
+  }
+
+  .vk-report { background: var(--surface-2); color: var(--text-primary); }
+  .vk-report * { box-sizing: border-box; }
+  .vk-wrap { max-width: 1080px; margin: 0 auto; padding: 32px 20px 64px; }
+
+  .vk-header { margin-bottom: 28px; }
+  .vk-eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .02em; color: var(--text-muted); text-transform: uppercase; margin: 0 0 6px; }
+  .vk-title { font-size: 28px; font-weight: 700; margin: 0 0 8px; letter-spacing: -0.01em; }
+  .vk-meta { font-size: 14px; color: var(--text-secondary); display: flex; flex-wrap: wrap; gap: 4px 18px; }
+  .vk-meta b { color: var(--text-primary); font-weight: 600; }
+
+  .vk-callout {
+    margin-top: 18px; padding: 14px 16px; border-radius: 10px;
+    background: var(--surface-1); border: 1px solid var(--border);
+    border-left: 3px solid var(--series-orange);
+    font-size: 14px; color: var(--text-secondary); line-height: 1.55;
+  }
+  .vk-callout b { color: var(--text-primary); }
+
+  .vk-section { margin-top: 40px; }
+  .vk-h2 { font-size: 19px; font-weight: 700; margin: 0 0 4px; letter-spacing: -0.005em; }
+  .vk-sub { font-size: 13.5px; color: var(--text-muted); margin: 0 0 18px; }
+
+  .vk-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  @media (max-width: 720px) { .vk-stats { grid-template-columns: repeat(2, 1fr); } }
+  .vk-tile {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px 16px 14px;
+  }
+  .vk-tile-label { font-size: 12.5px; color: var(--text-secondary); margin: 0 0 8px; }
+  .vk-tile-value { font-size: 24px; font-weight: 700; letter-spacing: -0.01em; }
+  .vk-tile-note { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+  .vk-card {
+    background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px;
+    padding: 18px 20px 14px; margin-bottom: 16px;
+  }
+  .vk-card-title { font-size: 14.5px; font-weight: 600; margin: 0 0 2px; }
+  .vk-card-sub { font-size: 12.5px; color: var(--text-muted); margin: 0 0 12px; }
+
+  .vk-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 800px) { .vk-grid2 { grid-template-columns: 1fr; } }
+
+  svg text { fill: var(--text-secondary); font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .vk-axis-label { fill: var(--text-muted); font-size: 11px; }
+  .vk-grid-line { stroke: var(--grid); stroke-width: 1; }
+  .vk-baseline { stroke: var(--baseline); stroke-width: 1; }
+  .vk-bar { cursor: pointer; transition: opacity .12s; }
+  .vk-bar:hover, .vk-bar.hover { opacity: .82; }
+  .vk-value-label { fill: var(--text-secondary); font-size: 11.5px; font-weight: 600; }
+  .vk-cat-label { fill: var(--text-secondary); font-size: 12.5px; }
+
+  .vk-tooltip {
+    position: fixed; pointer-events: none; z-index: 9999;
+    background: var(--tooltip-bg); color: var(--tooltip-text);
+    padding: 8px 11px; border-radius: 8px; font-size: 12.5px; line-height: 1.5;
+    box-shadow: 0 4px 16px rgba(0,0,0,.18); opacity: 0; transition: opacity .1s;
+    max-width: 240px;
+  }
+  .vk-tooltip.show { opacity: 1; }
+  .vk-tooltip .tt-title { font-weight: 700; margin-bottom: 2px; }
+  .vk-tooltip .tt-row { display: flex; justify-content: space-between; gap: 12px; }
+  .vk-tooltip .tt-key { opacity: .75; }
+
+  .vk-crosshair { stroke: var(--text-muted); stroke-width: 1; stroke-dasharray: 3 3; opacity: 0; }
+
+  table.vk-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  table.vk-table th, table.vk-table td { padding: 10px 12px; text-align: right; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  table.vk-table th:first-child, table.vk-table td:first-child { text-align: left; }
+  table.vk-table th { color: var(--text-muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .01em; }
+  table.vk-table td.vk-name { font-weight: 600; color: var(--text-primary); }
+  table.vk-table tbody tr:hover { background: var(--surface-2); }
+  .vk-badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 5px; margin-left: 6px; }
+  .vk-badge.a { background: color-mix(in srgb, var(--series-blue) 16%, transparent); color: var(--series-blue); }
+  .vk-badge.b { background: color-mix(in srgb, var(--series-orange) 16%, transparent); color: var(--series-orange); }
+  .vk-table-scroll { overflow-x: auto; }
+
+  .vk-prose { font-size: 14.5px; line-height: 1.7; color: var(--text-secondary); }
+  .vk-prose p { margin: 0 0 14px; }
+  .vk-prose b { color: var(--text-primary); }
+  .vk-prose ul { margin: 0 0 14px; padding-left: 20px; }
+  .vk-prose li { margin-bottom: 8px; }
+
+  .vk-footer { margin-top: 40px; padding-top: 18px; border-top: 1px solid var(--border); font-size: 12.5px; color: var(--text-muted); line-height: 1.6; }
+
+  .vk-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; font-size: 12.5px; color: var(--text-secondary); }
+  .vk-legend-item { display: flex; align-items: center; gap: 6px; }
+  .vk-legend-swatch { width: 10px; height: 10px; border-radius: 2px; }
+</style>
+</head>
+<body>
+
+
+<div class="vk-report">
+<div class="vk-wrap">
+
+  <div class="vk-header">
+    <p class="vk-eyebrow">VK Ads · Отчёт по рекламной кампании</p>
+    <h1 class="vk-title">Результаты продвижения — видеокреативы</h1>
+    <div class="vk-meta">
+      <span>Клиент: <b>укажи название перед отправкой</b></span>
+      <span>Период выгрузки: <b>01.05.2026 – 04.09.2026</b></span>
+      <span>Подготовлено: <b>04.09.2026</b></span>
+    </div>
+    <div class="vk-callout">
+      <b>Важно.</b> Выгрузка охватывает 01.05–04.09, но по факту показы и расход появляются только начиная с <b>25 августа</b> — за май, июнь и июль по всем 8 объявлениям нули. Весь отчёт ниже строится на реально активном периоде — <b>25.08–04.09 (11 дней)</b>. Если кампания должна была крутиться раньше — стоит сверить с кабинетом, не было ли задержки с запуском/модерацией.
+    </div>
+  </div>
+
+  <div class="vk-section">
+    <h2 class="vk-h2">Сводка за 25.08–04.09</h2>
+    <p class="vk-sub">Суммарно по двум группам объявлений (8 объявлений, 4 видеокреатива × 2 группы)</p>
+    <div class="vk-stats" id="stat-tiles"></div>
+  </div>
+
+  <div class="vk-section">
+    <h2 class="vk-h2">Динамика по дням</h2>
+    <p class="vk-sub">25 августа — 4 сентября 2026</p>
+    <div class="vk-card">
+      <p class="vk-card-title">Расход, ₽</p>
+      <p class="vk-card-sub">Дневной лимит явно ограничен около 400 ₽ — в 4 из 11 дней списание упирается ровно в эту отметку</p>
+      <div id="chart-spend"></div>
+    </div>
+    <div class="vk-grid2">
+      <div class="vk-card">
+        <p class="vk-card-title">Показы</p>
+        <div id="chart-impr"></div>
+      </div>
+      <div class="vk-card">
+        <p class="vk-card-title">CTR, %</p>
+        <div id="chart-ctr"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="vk-section">
+    <h2 class="vk-h2">Сравнение объявлений</h2>
+    <p class="vk-sub">Группа A и Группа B — два набора объявлений с одинаковыми 4 креативами, выгруженные отдельными файлами (вероятно, разные аудитории/адсеты — уточни точное название в кабинете)</p>
+
+    <div class="vk-legend">
+      <span class="vk-legend-item"><span class="vk-legend-swatch" style="background:var(--series-blue)"></span>Группа A</span>
+      <span class="vk-legend-item"><span class="vk-legend-swatch" style="background:var(--series-orange)"></span>Группа B</span>
+    </div>
+
+    <div class="vk-card">
+      <p class="vk-card-title">Расход по объявлениям, ₽</p>
+      <div id="chart-spend-creative"></div>
+    </div>
+    <div class="vk-card">
+      <p class="vk-card-title">CTR по объявлениям, %</p>
+      <div id="chart-ctr-creative"></div>
+    </div>
+
+    <div class="vk-card">
+      <p class="vk-card-title">Полная таблица по объявлениям</p>
+      <p class="vk-card-sub">Отсортировано по расходу</p>
+      <div class="vk-table-scroll">
+        <table class="vk-table" id="creative-table">
+          <thead>
+            <tr>
+              <th>Объявление</th>
+              <th>Расход, ₽</th>
+              <th>Показы</th>
+              <th>Клики</th>
+              <th>CTR, %</th>
+              <th>CPC, ₽</th>
+              <th>CPM, ₽</th>
+              <th>Результаты</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="vk-section">
+    <h2 class="vk-h2">Вовлечённость в видео</h2>
+    <p class="vk-sub">Суммарно по всем 8 объявлениям — путь от старта просмотра до полного досмотра</p>
+    <div class="vk-card">
+      <div id="chart-funnel"></div>
+      <p class="vk-card-sub" style="margin-top:10px;">У 4 из 8 объявлений метрика «10 секунд» выгружается нулевой (сама площадка её не считает для этих креативов) — поэтому суммарное значение на этом шаге ниже, чем на «25%». Это особенность выгрузки VK Ads, а не ошибка воронки.</p>
+    </div>
+  </div>
+
+  <div class="vk-section">
+    <h2 class="vk-h2">Выводы и рекомендации</h2>
+    <div class="vk-prose">
+      <p>За 11 дней активности потрачено <b>3 200 ₽</b>, получено <b>35 284 показа</b>, <b>120 кликов</b> и <b>3 целевых результата</b> — то есть цена за результат сложилась в районе <b>1 067 ₽</b>. Средний CTR 0,34% — на уровне нижней границы нормы для VK Ads видео; есть куда расти.</p>
+      <p><b>Лучший креатив — «Крео 2-2 — видео отзыв» (Группа A).</b> Самый низкий CPC (13,5 ₽) и лучший CTR (0,53%) среди всех восьми объявлений при спенде 905 ₽. Отзывы явно цепляют аудиторию сильнее остальных форматов — есть смысл нарастить на него бюджет.</p>
+      <p><b>Аутсайдер — «Крео 3 — 2» (Группа B).</b> Самый дорогой клик (80,6 ₽) и самый дорогой показ (CPM 161,55 ₽) при среднем CTR — деньги съедаются неэффективно. Стоит либо переработать креатив, либо снизить его долю бюджета в пользу лидера.</p>
+      <p><b>Группа A системно дешевле Группы B.</b> На трёх креативах из четырёх (2, 3, 4) у Группы A ниже CPM, чем у того же креатива в Группе B — иногда в разы (Крео 3: 53 ₽ у A против 162 ₽ у B). Похоже, аудитория/настройка в Группе A эффективнее — стоит сверить таргетинги и перераспределить бюджет в её пользу.</p>
+      <p><b>1–2 сентября — провал почти до нуля</b> (33 ₽ и 73 ₽ расхода, 0 кликов за оба дня), хотя в остальные дни списание стабильно доходит до ~400 ₽. Похоже на технический сбой, паузу на модерации или исчерпание бюджета кабинета — стоит проверить в интерфейсе VK Ads, что происходило в эти даты.</p>
+      <p><b>«Крео 1-2 — видео 1» (Группа A) — лидер по глубине просмотра:</b> из 7 634 стартов досмотрели до конца 1 310 (≈17%) — заметно больше остальных креативов. Хорошо работает на охват и знакомство с продуктом, но кликов приносит меньше, чем «Крео 2-2» — комбинация форматов в ротации оправдана.</p>
+      <ul>
+        <li>Перераспределить часть бюджета с «Крео 3 — 2» (Группа B) на «Крео 2-2 — видео отзыв» (Группа A).</li>
+        <li>Проверить в кабинете VK Ads, что случилось 1–2 сентября — не баг ли отчёта и не была ли кампания на паузе.</li>
+        <li>Если результат (конверсия) — приоритетная метрика, стоит обсудить с клиентом целевую цену за результат: пока это неизвестная база для сравнения (всего 3 результата за 11 дней).</li>
+        <li>Дневной лимит ~400 ₽, похоже, ограничивает объём показов в пиковые дни — если бюджет клиента позволяет, тест увеличения дневного лимита покажет, есть ли запас по масштабированию.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="vk-footer">
+    Источник данных: выгрузка VK Ads Ads Manager (Объявления, посуточно), два файла-экспорта по 4 объявления каждый. «Результат» — целевое действие, заданное в настройках кампании в кабинете VK Ads (точное определение цели уточняется в кабинете). Показатели рассчитаны как отношение суммарных значений за период (не среднее по дням).
+  </div>
+
+</div>
+</div>
+
+<div class="vk-tooltip" id="vk-tooltip"></div>
+
+<script>
+(function() {
+  const root = document.currentScript.previousElementSibling.parentElement.querySelector('.vk-report') || document.querySelector('.vk-report');
+  const cs = getComputedStyle(document.querySelector('.vk-report'));
+  const col = (name) => cs.getPropertyValue(name).trim();
+
+  const daily = [{"date_str": "25.08", "spend": 273.43, "impressions": 4089, "clicks": 17, "results": 0, "ctr": 0.416}, {"date_str": "26.08", "spend": 356.47, "impressions": 3979, "clicks": 19, "results": 0, "ctr": 0.478}, {"date_str": "27.08", "spend": 396.65, "impressions": 4297, "clicks": 17, "results": 2, "ctr": 0.396}, {"date_str": "28.08", "spend": 376.33, "impressions": 2661, "clicks": 8, "results": 0, "ctr": 0.301}, {"date_str": "29.08", "spend": 400.01, "impressions": 2958, "clicks": 6, "results": 0, "ctr": 0.203}, {"date_str": "30.08", "spend": 400.0, "impressions": 4918, "clicks": 15, "results": 0, "ctr": 0.305}, {"date_str": "31.08", "spend": 400.0, "impressions": 5284, "clicks": 18, "results": 0, "ctr": 0.341}, {"date_str": "01.09", "spend": 33.2, "impressions": 592, "clicks": 0, "results": 0, "ctr": 0.0}, {"date_str": "02.09", "spend": 72.91, "impressions": 697, "clicks": 0, "results": 0, "ctr": 0.0}, {"date_str": "03.09", "spend": 400.0, "impressions": 4767, "clicks": 17, "results": 0, "ctr": 0.357}, {"date_str": "04.09", "spend": 91.06, "impressions": 1042, "clicks": 3, "results": 1, "ctr": 0.288}];
+
+  const creatives = [
+    {group:"B", name:"Крео 3 — 2",            spend:967.19, impressions:5987,  clicks:12, results:1, ctr:0.200, cpc:80.60, cpm:161.55},
+    {group:"A", name:"Крео 2-2 — видео отзыв", spend:904.63, impressions:12611, clicks:67, results:1, ctr:0.531, cpc:13.50, cpm:71.73},
+    {group:"A", name:"Крео 1-2 — видео 1",     spend:593.51, impressions:7509,  clicks:22, results:1, ctr:0.293, cpc:26.98, cpm:79.04},
+    {group:"B", name:"Крео 4 — 1",             spend:176.91, impressions:1659,  clicks:3,  results:0, ctr:0.181, cpc:58.97, cpm:106.64},
+    {group:"A", name:"Крео 4-2",               spend:170.86, impressions:2043,  clicks:5,  results:0, ctr:0.245, cpc:34.17, cpm:83.63},
+    {group:"B", name:"Крео 1-2 — видео 1",     spend:169.28, impressions:2405,  clicks:5,  results:0, ctr:0.208, cpc:33.86, cpm:70.39},
+    {group:"B", name:"Крео 2-2 — видео отзыв", spend:141.08, impressions:1633,  clicks:3,  results:0, ctr:0.184, cpc:47.03, cpm:86.39},
+    {group:"A", name:"Крео 3-2",               spend:76.60,  impressions:1437,  clicks:3,  results:0, ctr:0.209, cpc:25.53, cpm:53.31}
+  ];
+
+  const funnelSteps = ['--seq-250','--seq-300','--seq-350','--seq-450','--seq-500','--seq-600'];
+  const funnel = [
+    {label:"Старт просмотра", value:31975},
+    {label:"10 секунд",       value:3077},
+    {label:"25%",             value:9055},
+    {label:"50%",             value:4798},
+    {label:"75%",             value:3069},
+    {label:"100%",            value:2381}
+  ];
+  funnel.forEach((f,i) => f.step = funnelSteps[i]);
+
+  const totals = {
+    spend: 3200.06, impressions: 35284, clicks: 120, results: 3,
+    ctr: 0.3401, cpc: 26.6672, cpm: 90.6944, cpr: 1066.6867
+  };
+
+  function fmt(n, opts) {
+    return Number(n).toLocaleString('ru-RU', opts || {});
+  }
+  function fmtMoney(n) { return fmt(n, {maximumFractionDigits:0}) + ' ₽'; }
+  function fmtMoney2(n) { return fmt(n, {maximumFractionDigits:2}) + ' ₽'; }
+  function fmtPct(n) { return fmt(n, {maximumFractionDigits:2}) + '%'; }
+  function fmtInt(n) { return fmt(n, {maximumFractionDigits:0}); }
+
+  // ---------- stat tiles ----------
+  const tiles = [
+    {label:'Расход', value: fmtMoney(totals.spend)},
+    {label:'Показы', value: fmtInt(totals.impressions)},
+    {label:'Клики', value: fmtInt(totals.clicks)},
+    {label:'CTR', value: fmtPct(totals.ctr)},
+    {label:'Результаты', value: fmtInt(totals.results), note:'целевых действий'},
+    {label:'Цена за результат', value: fmtMoney(totals.cpr)},
+    {label:'CPC', value: fmtMoney2(totals.cpc)},
+    {label:'CPM', value: fmtMoney2(totals.cpm)}
+  ];
+  const tilesEl = document.getElementById('stat-tiles');
+  tiles.forEach(t => {
+    const d = document.createElement('div');
+    d.className = 'vk-tile';
+    const l = document.createElement('p'); l.className='vk-tile-label'; l.textContent = t.label;
+    const v = document.createElement('div'); v.className='vk-tile-value'; v.textContent = t.value;
+    d.appendChild(l); d.appendChild(v);
+    if (t.note) { const n = document.createElement('p'); n.className='vk-tile-note'; n.textContent = t.note; d.appendChild(n); }
+    tilesEl.appendChild(d);
+  });
+
+  // ---------- tooltip ----------
+  const tooltip = document.getElementById('vk-tooltip');
+  function showTooltip(x, y, titleText, rows) {
+    tooltip.innerHTML = '';
+    const t = document.createElement('div'); t.className = 'tt-title'; t.textContent = titleText;
+    tooltip.appendChild(t);
+    rows.forEach(r => {
+      const row = document.createElement('div'); row.className = 'tt-row';
+      const k = document.createElement('span'); k.className = 'tt-key'; k.textContent = r[0];
+      const v = document.createElement('span'); v.style.fontWeight = '700'; v.textContent = r[1];
+      row.appendChild(k); row.appendChild(v);
+      tooltip.appendChild(row);
+    });
+    tooltip.classList.add('show');
+    positionTooltip(x, y);
+  }
+  function positionTooltip(x, y) {
+    const pad = 14;
+    let left = x + pad, top = y + pad;
+    const rect = tooltip.getBoundingClientRect();
+    if (left + rect.width > window.innerWidth - 8) left = x - rect.width - pad;
+    if (top + rect.height > window.innerHeight - 8) top = y - rect.height - pad;
+    tooltip.style.left = left + 'px';
+    tooltip.style.top = top + 'px';
+  }
+  function hideTooltip() { tooltip.classList.remove('show'); }
+
+  const NS = 'http://www.w3.org/2000/svg';
+  function svgEl(tag, attrs) {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+  function niceMax(v) {
+    if (v <= 0) return 1;
+    const mag = Math.pow(10, Math.floor(Math.log10(v)));
+    const norm = v / mag;
+    let n;
+    if (norm <= 1) n = 1; else if (norm <= 2) n = 2; else if (norm <= 5) n = 5; else n = 10;
+    return n * mag;
+  }
+
+  // ---------- vertical bar chart (daily) ----------
+  function renderVBarChart(containerId, data, key, color, opts) {
+    opts = opts || {};
+    const container = document.getElementById(containerId);
+    const width = 720, height = 220;
+    const padL = 44, padR = 12, padT = 12, padB = 28;
+    const plotW = width - padL - padR, plotH = height - padT - padB;
+    const maxVal = niceMax(Math.max(...data.map(d => d[key])) * 1.15);
+    const svg = svgEl('svg', {viewBox:`0 0 ${width} ${height}`, style:'display:block;width:100%;height:auto;font-size:11px;'});
+
+    const ticks = 4;
+    for (let i=0;i<=ticks;i++) {
+      const v = maxVal * i/ticks;
+      const y = padT + plotH - (v/maxVal)*plotH;
+      svg.appendChild(svgEl('line', {x1:padL, x2:width-padR, y1:y, y2:y, class: i===0?'vk-baseline':'vk-grid-line'}));
+      const t = svgEl('text', {x:padL-8, y:y+4, 'text-anchor':'end', class:'vk-axis-label'});
+      t.textContent = opts.fmtAxis ? opts.fmtAxis(v) : fmtInt(Math.round(v));
+      svg.appendChild(t);
+    }
+
+    const n = data.length;
+    const bandW = plotW / n;
+    const barW = Math.min(24, bandW * 0.55);
+
+    data.forEach((d, i) => {
+      const val = d[key];
+      const barH = (val/maxVal) * plotH;
+      const cx = padL + bandW*i + bandW/2;
+      const x = cx - barW/2;
+      const y = padT + plotH - barH;
+      const rect = svgEl('rect', {x, y, width:barW, height: Math.max(barH,0), rx:4, ry:4, fill:color, class:'vk-bar'});
+      svg.appendChild(rect);
+
+      const hit = svgEl('rect', {x: padL+bandW*i, y: padT, width:bandW, height:plotH, fill:'transparent', style:'cursor:pointer'});
+      hit.addEventListener('pointerenter', () => rect.classList.add('hover'));
+      hit.addEventListener('pointerleave', () => { rect.classList.remove('hover'); hideTooltip(); });
+      hit.addEventListener('pointermove', (ev) => {
+        showTooltip(ev.clientX, ev.clientY, d.date_str, opts.tooltipRows ? opts.tooltipRows(d) : [[opts.label || key, opts.fmtVal ? opts.fmtVal(val) : fmtInt(val)]]);
+      });
+      svg.appendChild(hit);
+
+      if (i % Math.ceil(n/11) === 0 || n <= 12) {
+        const lbl = svgEl('text', {x:cx, y:height-8, 'text-anchor':'middle', class:'vk-axis-label'});
+        lbl.textContent = d.date_str;
+        svg.appendChild(lbl);
+      }
+    });
+
+    container.appendChild(svg);
+  }
+
+  // ---------- line chart (CTR) ----------
+  function renderLineChart(containerId, data, key, color) {
+    const container = document.getElementById(containerId);
+    const width = 340, height = 220;
+    const padL = 40, padR = 12, padT = 14, padB = 28;
+    const plotW = width - padL - padR, plotH = height - padT - padB;
+    const maxVal = niceMax(Math.max(...data.map(d => d[key])) * 1.2) || 1;
+    const svg = svgEl('svg', {viewBox:`0 0 ${width} ${height}`, style:'display:block;width:100%;height:auto;font-size:10.5px;'});
+
+    const ticks = 4;
+    for (let i=0;i<=ticks;i++) {
+      const v = maxVal * i/ticks;
+      const y = padT + plotH - (v/maxVal)*plotH;
+      svg.appendChild(svgEl('line', {x1:padL, x2:width-padR, y1:y, y2:y, class: i===0?'vk-baseline':'vk-grid-line'}));
+      const t = svgEl('text', {x:padL-6, y:y+4, 'text-anchor':'end', class:'vk-axis-label'});
+      t.textContent = v.toFixed(2) + '%';
+      svg.appendChild(t);
+    }
+
+    const n = data.length;
+    const stepX = plotW / (n-1);
+    const pts = data.map((d,i) => {
+      const x = padL + stepX*i;
+      const y = padT + plotH - (d[key]/maxVal)*plotH;
+      return [x,y];
+    });
+
+    const path = svgEl('path', {d: 'M' + pts.map(p=>p.join(',')).join(' L'), fill:'none', stroke:color, 'stroke-width':2, 'stroke-linejoin':'round', 'stroke-linecap':'round'});
+    svg.appendChild(path);
+
+    const crosshair = svgEl('line', {x1:0,x2:0,y1:padT,y2:padT+plotH, class:'vk-crosshair'});
+    svg.appendChild(crosshair);
+
+    pts.forEach((p,i) => {
+      const dot = svgEl('circle', {cx:p[0], cy:p[1], r:4, fill:color, stroke: col('--surface-1'), 'stroke-width':2});
+      svg.appendChild(dot);
+      if (i===0 || i===n-1 || i % Math.ceil(n/6) === 0) {
+        const lbl = svgEl('text', {x:p[0], y:height-8, 'text-anchor':'middle', class:'vk-axis-label'});
+        lbl.textContent = data[i].date_str;
+        svg.appendChild(lbl);
+      }
+    });
+
+    const hit = svgEl('rect', {x:padL, y:padT, width:plotW, height:plotH, fill:'transparent', style:'cursor:crosshair'});
+    hit.addEventListener('pointermove', (ev) => {
+      const rect = svg.getBoundingClientRect();
+      const scaleX = width / rect.width;
+      const localX = (ev.clientX - rect.left) * scaleX;
+      let idx = Math.round((localX - padL) / stepX);
+      idx = Math.max(0, Math.min(n-1, idx));
+      crosshair.setAttribute('x1', pts[idx][0]);
+      crosshair.setAttribute('x2', pts[idx][0]);
+      crosshair.style.opacity = 1;
+      showTooltip(ev.clientX, ev.clientY, data[idx].date_str, [['CTR', fmtPct(data[idx][key])]]);
+    });
+    hit.addEventListener('pointerleave', () => { crosshair.style.opacity = 0; hideTooltip(); });
+    svg.appendChild(hit);
+
+    container.appendChild(svg);
+  }
+
+  // ---------- horizontal bar chart (creatives) ----------
+  function renderHBarChart(containerId, data, key, opts) {
+    opts = opts || {};
+    const container = document.getElementById(containerId);
+    const rowH = 34;
+    const width = 720;
+    const height = data.length * rowH + 16;
+    const padL = 170, padR = 70, padT = 8;
+    const plotW = width - padL - padR;
+    const maxVal = Math.max(...data.map(d => d[key])) * 1.08 || 1;
+    const svg = svgEl('svg', {viewBox:`0 0 ${width} ${height}`, style:'display:block;width:100%;height:auto;font-size:11.5px;'});
+
+    data.forEach((d, i) => {
+      const y = padT + i*rowH;
+      const barH = 18;
+      const val = d[key];
+      const barW = (val/maxVal) * plotW;
+      const color = d.group === 'A' ? col('--series-blue') : col('--series-orange');
+
+      const nameLbl = svgEl('text', {x:padL-8, y:y+barH/2+4, 'text-anchor':'end', class:'vk-cat-label'});
+      nameLbl.textContent = (opts.shortName ? opts.shortName(d.name) : d.name);
+      svg.appendChild(nameLbl);
+
+      const rect = svgEl('rect', {x:padL, y, width:Math.max(barW,2), height:barH, rx:4, ry:4, fill:color, class:'vk-bar'});
+      svg.appendChild(rect);
+
+      const valLbl = svgEl('text', {x:padL+barW+8, y:y+barH/2+4, class:'vk-value-label'});
+      valLbl.textContent = opts.fmtVal ? opts.fmtVal(val) : fmtInt(val);
+      svg.appendChild(valLbl);
+
+      const hit = svgEl('rect', {x:0, y, width, height:barH, fill:'transparent', style:'cursor:pointer'});
+      hit.addEventListener('pointerenter', () => rect.classList.add('hover'));
+      hit.addEventListener('pointerleave', () => { rect.classList.remove('hover'); hideTooltip(); });
+      hit.addEventListener('pointermove', (ev) => {
+        showTooltip(ev.clientX, ev.clientY, d.name, [
+          ['Группа', d.group],
+          [opts.label || key, opts.fmtVal ? opts.fmtVal(val) : fmtInt(val)],
+          ['Расход', fmtMoney(d.spend)],
+          ['Показы', fmtInt(d.impressions)],
+          ['Клики', fmtInt(d.clicks)]
+        ]);
+      });
+      svg.appendChild(hit);
+    });
+
+    container.appendChild(svg);
+  }
+
+  // ---------- funnel (ordinal sequential) ----------
+  function renderFunnel(containerId, data) {
+    const container = document.getElementById(containerId);
+    const rowH = 34;
+    const width = 720;
+    const height = data.length * rowH + 16;
+    const padL = 130, padR = 90, padT = 8;
+    const plotW = width - padL - padR;
+    const maxVal = data[0].value * 1.05;
+    const svg = svgEl('svg', {viewBox:`0 0 ${width} ${height}`, style:'display:block;width:100%;height:auto;font-size:12px;'});
+
+    data.forEach((d,i) => {
+      const y = padT + i*rowH;
+      const barH = 20;
+      const barW = (d.value/maxVal) * plotW;
+      const color = col(d.step);
+      const pct = (d.value / data[0].value * 100);
+
+      const lbl = svgEl('text', {x:padL-10, y:y+barH/2+4, 'text-anchor':'end', class:'vk-cat-label'});
+      lbl.textContent = d.label;
+      svg.appendChild(lbl);
+
+      const rect = svgEl('rect', {x:padL, y, width:Math.max(barW,2), height:barH, rx:4, ry:4, fill:color, class:'vk-bar'});
+      svg.appendChild(rect);
+
+      const valLbl = svgEl('text', {x:padL+barW+8, y:y+barH/2+4, class:'vk-value-label'});
+      valLbl.textContent = fmtInt(d.value) + '  ·  ' + pct.toFixed(1) + '%';
+      svg.appendChild(valLbl);
+
+      const hit = svgEl('rect', {x:0, y, width, height:barH, fill:'transparent', style:'cursor:pointer'});
+      hit.addEventListener('pointerenter', () => rect.classList.add('hover'));
+      hit.addEventListener('pointerleave', () => { rect.classList.remove('hover'); hideTooltip(); });
+      hit.addEventListener('pointermove', (ev) => {
+        showTooltip(ev.clientX, ev.clientY, d.label, [
+          ['Значение', fmtInt(d.value)],
+          ['От старта просмотра', pct.toFixed(1) + '%']
+        ]);
+      });
+      svg.appendChild(hit);
+    });
+
+    container.appendChild(svg);
+  }
+
+  renderVBarChart('chart-spend', daily, 'spend', col('--series-blue'), {label:'Расход', fmtVal: fmtMoney2, fmtAxis: (v)=>fmtInt(v)+' ₽'});
+  renderVBarChart('chart-impr', daily, 'impressions', col('--series-orange'), {label:'Показы', fmtVal: fmtInt});
+  renderLineChart('chart-ctr', daily, 'ctr', col('--series-aqua'));
+
+  const bySpend = [...creatives].sort((a,b) => b.spend - a.spend);
+  const byCtr = [...creatives].sort((a,b) => b.ctr - a.ctr);
+  const shortName = (n) => n.replace(/^Крео\s*/,'');
+  renderHBarChart('chart-spend-creative', bySpend, 'spend', {label:'Расход', fmtVal: fmtMoney, shortName});
+  renderHBarChart('chart-ctr-creative', byCtr, 'ctr', {label:'CTR', fmtVal: fmtPct, shortName});
+
+  renderFunnel('chart-funnel', funnel);
+
+  // ---------- table ----------
+  const tbody = document.querySelector('#creative-table tbody');
+  bySpend.forEach(d => {
+    const tr = document.createElement('tr');
+    const cells = [
+      null,
+      fmtMoney2(d.spend),
+      fmtInt(d.impressions),
+      fmtInt(d.clicks),
+      fmtPct(d.ctr),
+      fmtMoney2(d.cpc),
+      fmtMoney2(d.cpm),
+      fmtInt(d.results)
+    ];
+    const nameCell = document.createElement('td');
+    nameCell.className = 'vk-name';
+    nameCell.textContent = d.name;
+    const badge = document.createElement('span');
+    badge.className = 'vk-badge ' + (d.group === 'A' ? 'a' : 'b');
+    badge.textContent = 'Группа ' + d.group;
+    nameCell.appendChild(badge);
+    tr.appendChild(nameCell);
+    cells.slice(1).forEach(v => {
+      const td = document.createElement('td');
+      td.textContent = v;
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+})();
+</script>
+
+</body>
+</html>
